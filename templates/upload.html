@@ -1,0 +1,33 @@
+{% extends "template.html" %}
+{% block main %}
+
+<div class="container">
+    <br>
+      <div class="mx-auto" style="width: 600px;">
+      <h2>Upload Your picture for Attendance</h2>
+    </div>
+    
+    <br><br><br>
+    
+      <form  method="post" enctype="multipart/form-data">
+    
+     <div class="input-group mb-3" >
+    
+      <input type="file" name="file" class="form-control" id="inputGroupFile02">
+    
+       <div class="col-auto">
+        <button type="submit" value="Upload" class="btn btn-primary mb-3">Submit</button>
+      </div>
+    
+     </div>
+    </form>
+    </div>
+    
+    <div class="mx-auto" style="width: 1150px;">
+    <ul>
+        <li class="text-danger">Please Upload Png, Jpg, Jpeg, Gif Format only</li>
+        <li class="text-danger">Rename your image to your name before upload</li>
+     </ul>
+    </div>
+
+{% endblock %}
