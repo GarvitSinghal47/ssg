@@ -1,20 +1,19 @@
-# Password-Strength-Analysis
-Password Strength Recognition using Machine Learning Classification Algorithms  
-
-- Flask(Python web development framework) is used for displaying the results
-- Algorithms used are 
-  - Decision Trees
-  - Logistic Regression
-  - Naive Bayes (Bernoulli Distribution Model)
-  - Random Forest
-  - Neural Network (MLP Classifier)
-- TfidfVectorizer is used for text feature extraction for passwords
+# Problem Statement 
+Detailed information like check-in time, check-out time, date, and total working
+hours, to name a few, can be stored and saved. Administrators must register new
+students/employees on the system and provide some personal information.
 
 
-### Output
 
-![output1](static/output/output1.JPG)
-![output2](static/output/output2.JPG)
-![output3](static/output/output3.JPG)
-![output4](static/output/output4.JPG)
+# Tech Used :- 
+Cloud Platform :- Azure Cloud Platform
+FrameWok Used :- Flask
+Programming :- Python
+
+
+
+
+
+
+
 
