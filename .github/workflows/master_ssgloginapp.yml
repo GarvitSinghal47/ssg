@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'ssgloginapp'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D9F7E03121D64928A00C2485B9F89D86 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0C3DE462408F4EDB89787B844737EC99 }}
