@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Landing Page</title>
+    <style>
+*{
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-image: url(bg.jpg);
+    background-size: cover;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    width: auto;
+}
+
+.container {
+    width: auto;
+}
+
+nav {
+    position: absolute;
+    width: 100%;
+    height: 70px;
+    box-sizing: border-box;
+}
+
+nav .logo {
+    float: left;
+    font-size: 17px;
+    color: white;
+    padding: 15px;
+    margin-left: 30px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 5px;
+
+}
+
+.logo img{
+    border-radius: 5px;
+    width: 120px;
+    height: 30px;
+}
+
+nav ul {
+    float: right;
+    list-style: none;
+    margin-right: 30px;
+}
+
+nav ul li {
+    display: inline-flex;
+    margin: 0 5px;
+    font-size: 15px;
+    color: #000;
+    text-transform: uppercase;
+    border-radius: 6px;
+    text-align: center;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #000;
+    padding: 10px 20px;
+}
+
+nav ul li:hover {
+    background-color: crimson;
+}
+
+nav ul li:nth-child(5) {
+    background-color: crimson;
+}
+
+.deskripsi {
+    position: absolute;
+    width:45%;
+    height: 68% ;
+    top: 200px;
+    left: calc(50% - 22.5%);
+    text-align: center;
+
+}
+
+.deskripsi i:hover{
+    opacity: 1;
+}
+
+.deskripsi i{
+    position: absolute;
+    bottom: 0;
+    color: white;
+    opacity: .5;
+    text-decoration: none;
+    font-size: 40px;
+}
+
+.deskripsi h1 {
+    font-family: 'Raleway', sans-serif;
+    color: white;
+    font-weight: 1000;
+    letter-spacing: 10px;
+    font-size: 90px;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    width: 50%;
+}
+
+.deskripsi p {
+    line-height: 30px;
+    width: auto;
+    font-size: 15px;
+    letter-spacing: 3px;
+    font-family: 'Roboto', sans-serif;
+    color: #000;
+    margin: 0;
+}
+
+.deskripsi img {
+    opacity: .9;
+    width: 600px;
+    height: 150px;
+}
+
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+            <nav>
+                <div class="logo">
+                    <a href="landing.html"><img src="logo.png"></a>
+                </div>
+                <ul>
+                    <li><a href="#">Sign Up</a></li>
+                    <li><a href="#">Login</a></li>
+                </ul>
+            </nav>
+
+            <div class="deskripsi">
+                <img src="logo.png"><br><br>
+                <p>
+                    ATTENDANCE MADE EASY
+                    <P>A SMARTER WAY TO MANAGE ATTENDANCE</P>
+                </p>
+                <!-- <a href="#"><i class="fa fa-angle-double-down"></i></a> -->
+            </div>    
+    </div>
+</body>
+</html>
