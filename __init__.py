@@ -3,7 +3,7 @@ from flask import Flask, render_template, flash, request,redirect,session,Respon
 from flask_sqlalchemy import SQLAlchemy
 from extensions import db,login_manager
 from model import User,Manager
-from flask_login import login_required
+from flask_login import login_required,current_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import cv2 ,csv
@@ -11,6 +11,7 @@ import face_recognition
 import urllib.parse
 import os 
 import numpy as np
+from storage import *
 
 
 
@@ -61,16 +62,44 @@ def create_app():
    
     @app.route('/')
     def homepage():
-        return render_template('login.html')
+        return render_template('home.html')
 
-    @login_required
     @app.route('/index')
+    @login_required
+
     def enter():
         return render_template('index.html')
 
-    
+    @app.route("/use",methods=['GET','POST'])
     @login_required
+
+    def use():
+
+        if request.method=='POST':
+            uploaded_file = request.files['file']
+            if uploaded_file and allowed_file(uploaded_file.filename):
+                date = datetime.now()
+                uploadToBlob(uploaded_file, date)
+            redirect('/index')
+        email=session['user']
+        name=current_user.name
+        with open('attendance_2-2023.csv', 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            headers = next(reader)
+            email_index = headers.index("Name")
+            punch_in_index = headers.index("Date Time")
+            value=''
+            for row in reader:
+                if row[email_index] == email:
+                    value=row[punch_in_index]
+        return render_template("user.html",email=email,name=name,value=value)
+
+       
+
+
+   
     @app.route('/upload',methods=['GET','POST'])
+    @login_required    
     def upload():
 
         if request.method == "POST":
@@ -93,8 +122,9 @@ def create_app():
             # flash('Allowed image types are -> png, jpg, jpeg, gif')
             return render_template('upload.html')
 
-    @login_required
     @app.route('/punchin',methods=['GET','POST'])
+    @login_required
+
     def punchin():
             email =session["user"]
             now = datetime.now()
@@ -116,8 +146,9 @@ def create_app():
                     f.write(f'{email},{datestring}\n')        
             return render_template('punchin.html')
 
-    @login_required
     @app.route('/punchout',methods=['GET','POST'])
+    @login_required
+
     def punchout():
         email=session['user']
         now = datetime.now()
@@ -143,8 +174,9 @@ def create_app():
         return redirect("/index")
             
 
-    @login_required
     @app.route('/video')
+    @login_required
+
     def video():
         """Video streaming home page."""
         return render_template('video.html')
@@ -226,69 +258,14 @@ def create_app():
             key = cv2.waitKey(20)
             if key == 27:
                 break
-
-    @login_required           
     @app.route('/video_feed')
+    @login_required           
     def video_feed():
         """Video streaming route. Put this in the src attribute of an img tag."""
        
         return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-    # @login_required
-    # @app.route('/manage', methods=['GET', 'POST'])
-    # def manager() :
-    #     email = session['user']
-    #     alldata = Manager.query.filter_by(emailid=email).all()
-
-    #     if request.method == "POST":
-    #         website = request.form['website']
-    #         email = request.form['email']
-    #         password = request.form['password']
-
-            
-    #         manageinstance=Manager(website=website,emailid=email,password=password)
-    #         db.session.add(manageinstance)
-    #         db.session.commit()
-    #         email = session['user']
-    #         alldata = Manager.query.filter_by(emailid=email).all()
-
-    #         print(website)
-
-    #         return render_template('manager.html', data=alldata,value=1)
-        
-    #     else:
-            
-    #         return render_template('manager.html',value=1,data=alldata)
-
-    # @login_required
-    # @app.route('/delete/<int:sno>')
-    # def delete(sno):
-    #     todelete=Manager.query.filter_by(sno=sno).first()
-    #     db.session.delete(todelete)
-    #     db.session.commit()
-    #     return redirect("/manage")
-        
-
-    # @login_required
-    # @app.route('/update/<int:sno>', methods=['GET', 'POST'])
-    # def update(sno):
-    #     if request.method == "POST":
-    #         website = request.form["website"]
-    #         email = request.form['email']
-    #         password = request.form['password']
-    #         toupdate = Manager.query.filter_by(sno=sno).first()
-    #         toupdate.website=website
-    #         toupdate.emailid=email
-    #         toupdate.password=password
-            
-    #         db.session.add(toupdate)
-    #         db.session.commit()
-    #         return redirect("/manage")
-
-
-    #     toupdate = Manager.query.filter_by(sno=sno).first()
-    #     return render_template('update.html',toupdate=toupdate)
     return app
 
 if __name__ == "__main__":
