@@ -1,14 +1,16 @@
 from distutils.log import debug
-from flask import Flask, render_template, flash, request,redirect,session
+from flask import Flask, render_template, flash, request,redirect,session,Response,url_for
 from flask_sqlalchemy import SQLAlchemy
 from extensions import db,login_manager
 from model import User,Manager
 from flask_login import login_required
 from werkzeug.utils import secure_filename
-import datetime
-
+from datetime import datetime
+import cv2 ,csv
+import face_recognition
 import urllib.parse
 import os 
+import numpy as np
 
 
 
@@ -95,7 +97,7 @@ def create_app():
     @app.route('/punchin',methods=['GET','POST'])
     def punchin():
             email =session["user"]
-            now = datetime.datetime.now()
+            now = datetime.now()
             month_year = f'{now.month}-{now.year}'
             filename = f'attendance_{month_year}.csv'
             
@@ -114,6 +116,124 @@ def create_app():
                     f.write(f'{email},{datestring}\n')        
             return render_template('punchin.html')
 
+    @login_required
+    @app.route('/punchout',methods=['GET','POST'])
+    def punchout():
+        email=session['user']
+        now = datetime.now()
+        current_date = now.strftime("%Y-%m-%d")
+        current_time = now.strftime("%H:%M:%S")
+        found = False
+        with open('attendance_2-2023.csv', 'r') as f:
+            reader = csv.reader(f)
+            data = list(reader)
+            for row in data:
+                if row[0] == email :
+                    found = True
+                    if row[1] == '':
+                        row[1] = current_time
+                    else:
+                        row[1] = current_time
+                    break
+            if not found:
+                return redirect('/punchin')
+        with open('attendance_2-2023.csv', 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
+        return redirect("/index")
+            
+
+    @login_required
+    @app.route('/video')
+    def video():
+        """Video streaming home page."""
+        return render_template('video.html')
+
+
+    def gen():
+        IMAGE_FILES = []
+        filename = []
+        dir_path = app.config['UPLOAD_FOLDER']
+        print(dir_path)
+
+        for imagess in os.listdir(dir_path):
+            img_path = os.path.join(dir_path, imagess)
+            img_path = face_recognition.load_image_file(img_path)  # reading image and append to list
+            IMAGE_FILES.append(img_path)
+            filename.append(imagess.split(".", 1)[0])
+
+        def encoding_img(IMAGE_FILES):
+            encodeList = []
+            for img in IMAGE_FILES:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                encode = face_recognition.face_encodings(img)[0]
+                encodeList.append(encode)
+            return encodeList
+
+        def takeAttendence(name):
+            with open('attendence.csv', 'r+') as f:
+                name = filename[matchindex].upper()
+
+                mypeople_list = f.readlines()
+                nameList = []
+                for line in mypeople_list:
+                    entry = line.split(',')
+                    nameList.append(entry[0])
+                if name not in nameList:
+                    now = datetime.now()
+                    datestring = now.strftime('%H:%M:%S')
+                    f.writelines(f'\n{name},{datestring}')
+
+        encodeListknown = encoding_img(IMAGE_FILES)
+        # print(len('sucesses'))
+
+        cap = cv2.VideoCapture(0)
+
+        while True:
+            success, img = cap.read()
+            imgc = cv2.resize(img, (0, 0), None, 0.25, 0.25)
+            # converting image to RGB from BGR
+            imgc = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+            fasescurrent = face_recognition.face_locations(imgc)
+            encode_fasescurrent = face_recognition.face_encodings(imgc, fasescurrent)
+
+            # faceloc- one by one it grab one face location from fasescurrent
+            # than encodeFace grab encoding from encode_fasescurrent
+            # we want them all in same loop so we are using zip
+            for encodeFace, faceloc in zip(encode_fasescurrent, fasescurrent):
+                matches_face = face_recognition.compare_faces(encodeListknown, encodeFace)
+                face_distence = face_recognition.face_distance(encodeListknown, encodeFace)
+                # print(face_distence)
+                # finding minimum distence index that will return best match
+                matchindex = np.argmin(face_distence)
+
+                if matches_face[matchindex]:
+                    name = filename[matchindex].upper()
+                    # print(name)
+                    y1, x2, y2, x1 = faceloc
+                    # multiply locations by 4 because we above we reduced our webcam input image by 0.25
+                    # y1,x2,y2,x1 = y1*4,x2*4,y2*4,x1*4
+                    cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                    cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (255, 0, 0), 2, cv2.FILLED)
+                    cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                    takeAttendence(name)  # taking name for attendence function above
+
+            # cv2.imshow("campare", img)
+            # cv2.waitKey(0)
+            frame = cv2.imencode('.jpg', img)[1].tobytes()
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            key = cv2.waitKey(20)
+            if key == 27:
+                break
+
+    @login_required           
+    @app.route('/video_feed')
+    def video_feed():
+        """Video streaming route. Put this in the src attribute of an img tag."""
+       
+        return Response(gen(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
     # @login_required
     # @app.route('/manage', methods=['GET', 'POST'])
