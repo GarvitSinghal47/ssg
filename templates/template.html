@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>SSG</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="template.css">
+    <!-- Bootstrap -->
+    <link href="{{ url_for('static', filename = 'css/bootstrap.min.css') }}" rel="stylesheet">
+
+
+    
+
+</head>
+
+<body  opacity="">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/">SSG</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    
+    
+    <ul class="navbar-nav">
+        {% if not current_user.is_authenticated %}
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/login">Login</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-link" href="/signup">SignUp</a>
+      </li>
+      {% endif %}
+
+      {% if current_user.is_authenticated %}
+      <li class="nav-item active">
+        <a class="nav-link" href="/use">User</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Logout</a>
+      </li>
+      {% endif %}
+  </div>
+
+</nav>
+
+{% block main %}
+
+{% endblock %}
+   <script>
+    
+        function copyText(item) {
+          item2=""
+          for(let i=0;i<item.length;i++)
+          {
+            item2+=item[i];
+          }
+          console.log(item2)
+            /* Copy text into clipboard */
+            navigator.clipboard.writeText
+                (item2);
+                alert("copied")
+        }
+         
+function showpassword(data) {
+    var x = document.getElementById(`mytemp${data}`);
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+</script>
+
+<script>
+const form = document.getElementById("signup-form");
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const email = form.elements.email.value;
+  const password = form.elements.password.value;
+  const name= form.elements.name.value;
+  const confirmPassword = form.elements.confirmpassword.value;
+
+  if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
+
+  const data = { email, password,name };
+
+  fetch("/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    console.log(response)
+    return response.json()
+  })
+  .then(data => {
+    console.log(data)
+    if (data.success) {
+      window.location.href = "/index"
+    } else {
+      alert(data.message)
+    }
+  })
+
+
+  })
+  .catch(error=>{
+    alert("an error occured:"+error);
+  });
+
+
+</script>
+
+
+<script>
+  // Get the current date and time
+var currentDate = new Date();
+
+// Update the email, date, and time on the page
+document.getElementById("email").innerHTML = session['user'];
+document.getElementById("date").innerHTML = currentDate.toLocaleDateString();
+document.getElementById("time").innerHTML = currentDate.toLocaleTimeString();
+
+// Add a click event handler to the punch button
+document.getElementById("punch-button").addEventListener("click", function() {
+  // Send a request to the server to punch in
+  fetch("/punchin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: email,
+      date: currentDate.toISOString()
+    })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Show a success message
+        alert("Punch In Successful!");
+      } else {
+        // Show an error message
+        alert("An error occurred: " + data.message);
+      }
+    })
+    .catch(error => {
+      // Show an error message
+      alert("An error occurred: " + error);
+    });
+});
+</script>
+</body>
+
+
+</html>
